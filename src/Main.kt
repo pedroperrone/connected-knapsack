@@ -1,10 +1,19 @@
+import java.io.FileNotFoundException
+
 fun main(args: Array<String>) {
-    val instanceParams = ConnectedKanpsackFormatter.fromFile(args[0])
-    println("Pesos: ${instanceParams[0]}")
-    println("Valores: ${instanceParams[1]}")
-    println("Grafo: ${instanceParams[2]}")
-    println("Peso da mochila: ${instanceParams[3]}")
-    val problemInstance = ConnectedKnapsack(instanceParams[0] as FloatArray, instanceParams[1] as FloatArray,
-                                            instanceParams[2] as Array<BooleanArray>, instanceParams[3] as Float)
-    problemInstance.tabuSearch()
+    lateinit var instanceParams: List<Any>
+    try {
+        println("Reading input")
+        instanceParams = ConnectedKanpsackFormatter.fromFile(args[0])
+    } catch (e: FileNotFoundException) {
+        println("No file found with the name given as parameter.")
+        return
+    }
+    val weights = (instanceParams[0] as List<Float>).toTypedArray()
+    val values = (instanceParams[1] as List<Float>).toTypedArray()
+    val adjacencyMatrix = (instanceParams[2] as List<List<Boolean>>).map { row -> row.toTypedArray() }.toTypedArray()
+    val knapsackCapacity = instanceParams[3] as Float
+
+    val problemInstance = ConnectedKnapsack(weights, values, adjacencyMatrix, knapsackCapacity)
+    println(problemInstance.tabuSearch())
 }
