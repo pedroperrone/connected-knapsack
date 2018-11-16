@@ -14,12 +14,12 @@ class ConnectedKanpsackFormatter {
 
             val adjacencyMatrix = createAdjacencyMatrix(lines, amountOfElements)
 
-            val finalValues = listOf<Any>(weights, values, adjacencyMatrix, knapsackWeight)
+            val finalValues = listOf(weights, values, adjacencyMatrix, knapsackWeight)
             return finalValues
         }
 
-        private fun createAdjacencyMatrix(lines: MutableList<String>, matrixSize: Int): Array<BooleanArray> {
-            val adjacencyMatrix = Array<BooleanArray>(matrixSize) { BooleanArray(matrixSize) { false } }
+        private fun createAdjacencyMatrix(lines: MutableList<String>, matrixSize: Int): List<List<Boolean>> {
+            val adjacencyMatrix = MutableList(matrixSize) { MutableList(matrixSize) { false } }
             for (line in lines) {
                 val parsedLine = line.split(" ").map { index -> index.toInt() }
                 adjacencyMatrix[parsedLine[0]][parsedLine[1]] = true
