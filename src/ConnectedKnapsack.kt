@@ -1,4 +1,3 @@
-import kotlin.reflect.jvm.internal.impl.utils.DFS
 
 class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val adjacencyMatrix: Array<Array<Boolean>>,
                         val knapsackCapacity: Float) {
@@ -7,16 +6,9 @@ class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val
 
     val amountOfElements = weights.size
     var currentSolution = Array(amountOfElements) { false }
+    var bestSolution = currentSolution.clone()
     val tabuArray = Array(amountOfElements) { 0 }
     val elementsRange = (0..amountOfElements - 1)
-
-    init {
-//        for (index in elementsRange) {
-//            if ((index % 2) == 0) {
-//                currentSolution[index] = true
-//            }
-//        }
-    }
 
     fun tabuSearch(): Float {
         println("Starting Tabu Search...")
@@ -30,13 +22,15 @@ class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val
             val sortedValidNeighbors = values.filter { v -> v.first }.sortedByDescending { v -> v.second }
             if (!sortedValidNeighbors.isEmpty()) {
                 val bestNeighbor = sortedValidNeighbors[0]
-                val bola = neighbors.find { n -> n.second == bestNeighbor.third }!!
                 currentSolution = neighbors.find { n -> n.second == bestNeighbor.third }!!.first.clone()
                 tabuArray[bestNeighbor.third] = TABU_ITERATIONS
+                if (selectionValue(currentSolution) > selectionValue(bestSolution)) {
+                    bestSolution = currentSolution.clone()
+                }
             }
             iterationCounter++
         }
-        return selectionValue(currentSolution)
+        return selectionValue(bestSolution)
     }
 
     private fun generateNeighbors(): List<Pair<Array<Boolean>, Int>> {
@@ -73,18 +67,22 @@ class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val
     }
 
     private fun fitInKnapsack(selectionArray: Array<Boolean>): Boolean {
-        return selectionValue(selectionArray) <= knapsackCapacity
+        return selectionWeight(selectionArray) <= knapsackCapacity
     }
 
     private fun subGraphIsConnected(selectionArray: Array<Boolean>): Boolean {
         return true
     }
 
-    private fun selectionValue(selectionArray: Array<Boolean>): Float {
+    private fun selectionValue(selectionArray: Array<Boolean>): Float = selectionSum(selectionArray, values)
+
+    private fun selectionWeight(selectionArray: Array<Boolean>): Float = selectionSum(selectionArray, weights)
+
+    private fun selectionSum(selectionArray: Array<Boolean>, valuesArray: Array<Float>): Float {
         var sum = 0F
         for (index in elementsRange) {
             if (selectionArray[index]) {
-                sum += values[index]
+                sum += valuesArray[index]
             }
         }
         return sum
