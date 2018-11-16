@@ -14,8 +14,7 @@ class ConnectedKanpsackFormatter {
 
             val adjacencyMatrix = createAdjacencyMatrix(lines, amountOfElements)
 
-            val finalValues = listOf(weights, values, adjacencyMatrix, knapsackWeight)
-            return finalValues
+            return listOf(weights, values, adjacencyMatrix, knapsackWeight)
         }
 
         private fun createAdjacencyMatrix(lines: MutableList<String>, matrixSize: Int): List<List<Boolean>> {
