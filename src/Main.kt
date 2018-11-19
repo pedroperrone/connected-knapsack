@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException
+import kotlin.system.measureTimeMillis
 
 fun main(args: Array<String>) {
     lateinit var instanceParams: List<Any>
@@ -13,7 +14,9 @@ fun main(args: Array<String>) {
     val values = (instanceParams[1] as List<Float>).toTypedArray()
     val adjacencyMatrix = (instanceParams[2] as List<List<Boolean>>).map { row -> row.toTypedArray() }.toTypedArray()
     val knapsackCapacity = instanceParams[3] as Float
-
-    val problemInstance = ConnectedKnapsack(weights, values, adjacencyMatrix, knapsackCapacity)
-    println(problemInstance.tabuSearch())
+    val time = measureTimeMillis {
+        val problemInstance = ConnectedKnapsack(weights, values, adjacencyMatrix, knapsackCapacity)
+        println(problemInstance.tabuSearch())
+    }
+    println("Execution took $time milliseconds to run.")
 }
