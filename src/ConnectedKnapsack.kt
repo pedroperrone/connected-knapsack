@@ -1,8 +1,11 @@
+import kotlin.math.ceil
+import kotlin.math.floor
 
 class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val adjacencyMatrix: Array<Array<Boolean>>,
                         val knapsackCapacity: Float) {
 
     val TABU_ITERATIONS = 3
+    val NUMBER_OF_THREADS = 8
 
     val amountOfElements = weights.size
     var currentSolution = Array(amountOfElements) { false }
@@ -18,7 +21,17 @@ class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val
                 println("Starting iteration $iterationCounter")
             }
             val neighbors = generateNeighbors()
-            val values = calculateValues(neighbors)
+            val threads = mutableListOf<CustomThread>()
+            var values = listOf<Triple<Boolean, Float, Int>>()
+            for (indexesPair in indexesPairs()) {
+                val newThread = CustomThread { calculateValues(neighbors.subList(indexesPair.first, indexesPair.second)) }
+                newThread.start()
+                threads.add(newThread)
+            }
+            for (thread in threads) {
+                thread.join()
+                values = values + (thread.getResponse() as List<Triple<Boolean, Float, Int>>)
+            }
             val sortedValidNeighbors = values.filter { v -> v.first }.sortedByDescending { v -> v.second }
             if (!sortedValidNeighbors.isEmpty()) {
                 val bestNeighbor = sortedValidNeighbors[0]
@@ -41,6 +54,15 @@ class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val
             neighbors.add(Pair(neighbor, index))
         }
         return neighbors
+    }
+
+    private fun indexesPairs(): MutableList<Pair<Int, Int>> {
+        val ranges = mutableListOf<Pair<Int, Int>>()
+        val rangeSize = amountOfElements / NUMBER_OF_THREADS
+        for (i in 1..NUMBER_OF_THREADS) {
+            ranges.add(Pair(floor((i - 1).toDouble() * rangeSize).toInt(), ceil(i.toDouble() * rangeSize).toInt()))
+        }
+        return ranges
     }
 
     private fun calculateValues(neighbors: List<Pair<Array<Boolean>, Int>>): List<Triple<Boolean, Float, Int>> {
