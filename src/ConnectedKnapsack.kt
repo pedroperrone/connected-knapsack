@@ -4,7 +4,7 @@ import kotlin.math.floor
 class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val adjacencyMatrix: Array<Array<Boolean>>,
                         val knapsackCapacity: Float) {
 
-    val TABU_ITERATIONS = 3
+    val TABU_ITERATIONS = 300
     val NUMBER_OF_THREADS = 8
 
     val amountOfElements = weights.size
@@ -93,7 +93,7 @@ class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val
     }
 
     private fun subGraphIsConnected(selectionArray: Array<Boolean>): Boolean {
-        return true
+        return Graph(adjacencyMatrix).subgraphIsConnected(selectionArray)
     }
 
     private fun selectionValue(selectionArray: Array<Boolean>): Float = selectionSum(selectionArray, values)
