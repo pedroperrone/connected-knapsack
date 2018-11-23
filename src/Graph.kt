@@ -5,7 +5,9 @@ class Graph(val adjacencyMatrix: Array<Array<Boolean>>) {
     val closedVertexes = mutableListOf<Int>()
 
     fun isConnected(): Boolean {
-        expand(0)
+        if (closedVertexes.isEmpty()) {
+            expand(0)
+        }
         return vertexesRange.toList() == closedVertexes.sorted()
     }
 
@@ -30,5 +32,28 @@ class Graph(val adjacencyMatrix: Array<Array<Boolean>>) {
             return
         }
         openedVertexes.add(vertex)
+    }
+
+    fun subgraphIsConnected(subgraphSelection: Array<Boolean>): Boolean {
+        return generateSubgraph(subgraphSelection).isConnected()
+    }
+
+    private fun generateSubgraph(subgraphSelection: Array<Boolean>): Graph {
+        val subgraphSize = subgraphSelection.count { v -> v }
+        val subgraphMatrix = Array(subgraphSize) { Array(subgraphSize) { false } }
+        var subgraphVertex = 0
+        for (vertex in vertexesRange) {
+            if (subgraphSelection[vertex]) {
+                var subgraphAdjacency = 0
+                for (adjacency in vertexesRange) {
+                    if (subgraphSelection[adjacency]) {
+                        subgraphMatrix[subgraphVertex][subgraphAdjacency] = adjacencyMatrix[vertex][adjacency]
+                        subgraphAdjacency++
+                    }
+                }
+                subgraphVertex++
+            }
+        }
+        return Graph(subgraphMatrix)
     }
 }
