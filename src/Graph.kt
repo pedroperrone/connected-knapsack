@@ -1,14 +1,13 @@
 class Graph(val adjacencyMatrix: Array<Array<Boolean>>) {
     val graphSize = adjacencyMatrix.size
     val vertexesRange = 0 until graphSize
-    val openedVertexes = mutableListOf<Int>()
-    val closedVertexes = mutableListOf<Int>()
+    val openedVertexesList = mutableListOf<Int>()
+    val openedVertexes = Array(graphSize) { false }
+    val closedVertexes = Array(graphSize) { false }
 
     fun isConnected(): Boolean {
-        if (closedVertexes.isEmpty()) {
-            expand(0)
-        }
-        return vertexesRange.toList() == closedVertexes.sorted()
+        expand(0)
+        return closedVertexes.all { v -> v }
     }
 
     private fun expand(vertex: Int) {
@@ -17,21 +16,22 @@ class Graph(val adjacencyMatrix: Array<Array<Boolean>>) {
                 addToOpened(adjacency)
             }
         }
-        closedVertexes.add(vertex)
-        if (openedVertexes.isEmpty()) {
+        closedVertexes[vertex] = true
+        if (openedVertexesList.isEmpty()) {
             return
         }
-        expand(openedVertexes.removeAt(0))
+        expand(openedVertexesList.removeAt(0))
     }
 
     private fun addToOpened(vertex: Int) {
-        if (openedVertexes.contains(vertex)) {
+        if (openedVertexes[vertex]) {
             return
         }
-        if (closedVertexes.contains(vertex)) {
+        if (closedVertexes[vertex]) {
             return
         }
-        openedVertexes.add(vertex)
+        openedVertexes[vertex] = true
+        openedVertexesList.add(vertex)
     }
 
     fun subgraphIsConnected(subgraphSelection: Array<Boolean>): Boolean {
