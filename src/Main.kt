@@ -15,7 +15,7 @@ fun main(args: Array<String>) {
     val adjacencyMatrix = (instanceParams[2] as List<List<Boolean>>).map { row -> row.toTypedArray() }.toTypedArray()
     val knapsackCapacity = instanceParams[3] as Float
     val time = measureTimeMillis {
-        val problemInstance = ConnectedKnapsack(weights, values, adjacencyMatrix, knapsackCapacity)
+        val problemInstance = ConnectedKnapsack(weights, values, adjacencyMatrix, knapsackCapacity, args[1].toFloat(), args[2].toFloat())
         println(problemInstance.tabuSearch())
     }
     println("Execution took $time milliseconds to run.")

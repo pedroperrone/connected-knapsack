@@ -2,21 +2,23 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val adjacencyMatrix: Array<Array<Boolean>>,
-                        val knapsackCapacity: Float) {
-
-    val TABU_ITERATIONS = 300
-    val NUMBER_OF_THREADS = 8
+                        val knapsackCapacity: Float, tabuRate: Float, iterationsRate: Float) {
 
     val amountOfElements = weights.size
     var currentSolution = Array(amountOfElements) { false }
     var bestSolution = currentSolution.clone()
+    var bestSolutionValue = 0
     val tabuArray = Array(amountOfElements) { 0 }
     val elementsRange = (0..amountOfElements - 1)
+    val amountOfIterations = ceil(amountOfElements * iterationsRate).toInt()
+
+    val TABU_ITERATIONS = ceil(amountOfElements * tabuRate).toInt()
+    val NUMBER_OF_THREADS = 8
 
     fun tabuSearch(): Float {
         println("Starting Tabu Search...")
         var iterationCounter = 0
-        while (iterationCounter < amountOfElements) {
+        while (iterationCounter < amountOfIterations) {
             if (iterationCounter % 100 == 0) {
                 println("Starting iteration $iterationCounter")
             }
