@@ -35,6 +35,9 @@ class Graph(val adjacencyMatrix: Array<Array<Boolean>>) {
     }
 
     fun subgraphIsConnected(subgraphSelection: Array<Boolean>): Boolean {
+        if (subgraphSelection.filter { v -> v }.isEmpty()) {
+            return false
+        }
         return generateSubgraph(subgraphSelection).isConnected()
     }
 
