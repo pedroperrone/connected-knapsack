@@ -1,19 +1,25 @@
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.random.Random
 
 class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val adjacencyMatrix: Array<Array<Boolean>>,
-                        val knapsackCapacity: Float, tabuRate: Float, iterationsRate: Float) {
+                        val knapsackCapacity: Float, tabuRate: Float, iterationsRate: Float, val randomSeed: Int) {
 
     val amountOfElements = weights.size
     var currentSolution = Array(amountOfElements) { false }
     var bestSolution = currentSolution.clone()
-    var bestSolutionValue = 0
     val tabuArray = Array(amountOfElements) { 0 }
     val elementsRange = (0..amountOfElements - 1)
     val amountOfIterations = ceil(amountOfElements * iterationsRate).toInt()
 
     val TABU_ITERATIONS = ceil(amountOfElements * tabuRate).toInt()
     val NUMBER_OF_THREADS = 8
+
+    init {
+        generateInitialSolution()
+        bestSolution = currentSolution
+    }
 
     fun tabuSearch(): Float {
         println("Starting Tabu Search...")
@@ -46,6 +52,28 @@ class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val
             iterationCounter++
         }
         return selectionValue(bestSolution)
+    }
+
+    private fun generateInitialSolution() {
+        val firstItemIndex = Random(randomSeed).nextInt(amountOfElements)
+        val firstSolution = Array(amountOfElements) { false }
+        firstSolution[firstItemIndex] = true
+        while (firstSolution.toList() != currentSolution.toList() && fitInKnapsack(firstSolution)) {
+            currentSolution = firstSolution.clone()
+            var itemIndex = 0
+            for (item in firstSolution) {
+                if (item) {
+                    var adjacencyIndex = 0
+                    for (adjacency in adjacencyMatrix[itemIndex]) {
+                        if (adjacency) {
+                            firstSolution[adjacencyIndex] = true
+                        }
+                        adjacencyIndex += 1
+                    }
+                }
+                itemIndex += 1
+            }
+        }
     }
 
     private fun generateNeighbors(): List<Pair<Array<Boolean>, Int>> {
