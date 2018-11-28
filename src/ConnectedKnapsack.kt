@@ -21,12 +21,12 @@ class ConnectedKnapsack(
         bestSolution = currentSolution
     }
 
-    fun tabuSearch(): Float {
+    fun tabuSearch(): Pair<Float, List<Int>> {
         println("Starting Tabu Search...")
         var iterationCounter = 0
         while (iterationCounter < amountOfIterations) {
-            if (iterationCounter % 100 == 0) {
-                println("Starting iteration $iterationCounter")
+            if (iterationCounter % amountOfElements == 0) {
+                println("In iteration $iterationCounter the best value is ${selectionValue(bestSolution)}")
             }
             val neighbors = generateNeighbors()
             val values = neighbors.filter { n -> neighborIsValid(n) }.sortedByDescending { n -> selectionValue(n.first) }
@@ -40,7 +40,7 @@ class ConnectedKnapsack(
             } catch (e: NoSuchElementException) {}
             iterationCounter++
         }
-        return selectionValue(bestSolution)
+        return Pair(selectionValue(bestSolution), solutionAsIndexesList())
     }
 
     private fun generateInitialSolution() {
@@ -124,5 +124,15 @@ class ConnectedKnapsack(
             }
         }
         return sum
+    }
+
+    private fun solutionAsIndexesList(): List<Int> {
+        val indexesList = mutableListOf<Int>()
+        for (itemIndex in elementsRange) {
+            if (bestSolution[itemIndex]) {
+                indexesList.add(itemIndex)
+            }
+        }
+        return  indexesList
     }
 }

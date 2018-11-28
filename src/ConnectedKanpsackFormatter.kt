@@ -26,5 +26,9 @@ class ConnectedKanpsackFormatter {
             }
             return adjacencyMatrix
         }
+
+        fun output(fileName: String, fileContent: List<Int>) {
+            File(fileName).writeText(fileContent.toString())
+        }
     }
 }
