@@ -1,20 +1,20 @@
-import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.random.Random
 
-class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val adjacencyMatrix: Array<Array<Boolean>>,
-                        val knapsackCapacity: Float, tabuRate: Float, iterationsRate: Float, val randomSeed: Int) {
+class ConnectedKnapsack(
+    private val weights: Array<Float>, private val values: Array<Float>, private val adjacencyMatrix: Array<Array<Boolean>>,
+    private val knapsackCapacity: Float, tabuRate: Float, iterationsRate: Float, private val randomSeed: Int) {
 
-    val amountOfElements = weights.size
-    var currentSolution = Array(amountOfElements) { false }
-    var bestSolution = currentSolution.clone()
-    val tabuArray = Array(amountOfElements) { 0 }
-    val elementsRange = (0..amountOfElements - 1)
-    val amountOfIterations = ceil(amountOfElements * iterationsRate).toInt()
+    private val amountOfElements = weights.size
+    private var currentSolution = Array(amountOfElements) { false }
+    private var bestSolution = currentSolution.clone()
+    private val tabuArray = Array(amountOfElements) { 0 }
+    private val elementsRange = (0 until amountOfElements)
+    private val amountOfIterations = ceil(amountOfElements * iterationsRate).toInt()
 
-    val TABU_ITERATIONS = ceil(amountOfElements * tabuRate).toInt()
-    val NUMBER_OF_THREADS = 8
+    private val TABU_ITERATIONS = ceil(amountOfElements * tabuRate).toInt()
+    private val NUMBER_OF_THREADS = 8
 
     init {
         generateInitialSolution()
@@ -29,26 +29,15 @@ class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val
                 println("Starting iteration $iterationCounter")
             }
             val neighbors = generateNeighbors()
-            val threads = mutableListOf<CustomThread>()
-            var values = listOf<Triple<Boolean, Float, Int>>()
-            for (indexesPair in indexesPairs()) {
-                val newThread = CustomThread { calculateValues(neighbors.subList(indexesPair.first, indexesPair.second)) }
-                newThread.start()
-                threads.add(newThread)
-            }
-            for (thread in threads) {
-                thread.join()
-                values = values + (thread.getResponse() as List<Triple<Boolean, Float, Int>>)
-            }
-            val sortedValidNeighbors = values.filter { v -> v.first }.sortedByDescending { v -> v.second }
-            if (!sortedValidNeighbors.isEmpty()) {
-                val bestNeighbor = sortedValidNeighbors[0]
-                currentSolution = neighbors.find { n -> n.second == bestNeighbor.third }!!.first.clone()
-                tabuArray[bestNeighbor.third] = TABU_ITERATIONS
+            val values = neighbors.filter { n -> neighborIsValid(n) }.sortedByDescending { n -> selectionValue(n.first) }
+            try {
+                val bestNeighbor = values.first { n -> subGraphIsConnected(n.first) }
+                currentSolution = bestNeighbor.first
+                tabuArray[bestNeighbor.second] = TABU_ITERATIONS
                 if (selectionValue(currentSolution) > selectionValue(bestSolution)) {
                     bestSolution = currentSolution.clone()
                 }
-            }
+            } catch (e: NoSuchElementException) {}
             iterationCounter++
         }
         return selectionValue(bestSolution)
@@ -112,10 +101,7 @@ class ConnectedKnapsack(val weights: Array<Float>, val values: Array<Float>, val
             tabuArray[neighbor.second]--
             return false
         }
-        if (!fitInKnapsack(neighbor.first)) {
-            return false
-        }
-        return subGraphIsConnected(neighbor.first)
+        return fitInKnapsack(neighbor.first)
     }
 
     private fun fitInKnapsack(selectionArray: Array<Boolean>): Boolean {
