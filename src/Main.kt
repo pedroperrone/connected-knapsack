@@ -1,6 +1,7 @@
 import java.io.FileNotFoundException
 import kotlin.system.measureTimeMillis
 
+@Suppress("UNCHECKED_CAST")
 fun main(args: Array<String>) {
     lateinit var instanceParams: List<Any>
     try {
