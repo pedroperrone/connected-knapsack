@@ -18,7 +18,7 @@ class ConnectedKnapsack(
 
     init {
         generateInitialSolution()
-        bestSolution = currentSolution
+        bestSolution = currentSolution.clone()
     }
 
     fun tabuSearch(): Pair<Float, List<Int>> {
@@ -45,24 +45,7 @@ class ConnectedKnapsack(
 
     private fun generateInitialSolution() {
         val firstItemIndex = Random(randomSeed).nextInt(amountOfElements)
-        val firstSolution = Array(amountOfElements) { false }
-        firstSolution[firstItemIndex] = true
-        while (firstSolution.toList() != currentSolution.toList() && fitInKnapsack(firstSolution)) {
-            currentSolution = firstSolution.clone()
-            var itemIndex = 0
-            for (item in firstSolution) {
-                if (item) {
-                    var adjacencyIndex = 0
-                    for (adjacency in adjacencyMatrix[itemIndex]) {
-                        if (adjacency) {
-                            firstSolution[adjacencyIndex] = true
-                        }
-                        adjacencyIndex += 1
-                    }
-                }
-                itemIndex += 1
-            }
-        }
+        currentSolution[firstItemIndex] = true
     }
 
     private fun generateNeighbors(): List<Pair<Array<Boolean>, Int>> {
