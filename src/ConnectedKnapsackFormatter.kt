@@ -1,6 +1,6 @@
 import java.io.File
 
-class ConnectedKanpsackFormatter {
+class ConnectedKnapsackFormatter {
     companion object {
         fun fromFile(fileName: String): List<Any> {
             val lines = mutableListOf<String>()

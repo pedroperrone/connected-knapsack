@@ -6,7 +6,7 @@ fun main(args: Array<String>) {
     lateinit var instanceParams: List<Any>
     try {
         println("Reading input")
-        instanceParams = ConnectedKanpsackFormatter.fromFile(args[1])
+        instanceParams = ConnectedKnapsackFormatter.fromFile(args[1])
     } catch (e: FileNotFoundException) {
         println("No file found with the name given as parameter.")
         return
@@ -25,5 +25,5 @@ fun main(args: Array<String>) {
     }
     println("Execution took $time milliseconds to run.")
     println("Writing result in ${args[0]}")
-    ConnectedKanpsackFormatter.output(args[0], result.second)
+    ConnectedKnapsackFormatter.output(args[0], result.second)
 }
